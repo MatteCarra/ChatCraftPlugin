@@ -1,0 +1,4 @@
+name: ChatCraftPlugin
+main: mattecarra.chatcraft.plugin.ChatCraftPluginBungee
+version: 1.0
+author: Carra

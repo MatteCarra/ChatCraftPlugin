@@ -1,0 +1,4 @@
+name: ChatCraftPlugin
+main: mattecarra.chatcraft.plugin.ChatCraftPluginBukkit
+version: 1.0
+author: Carra
