@@ -1,0 +1,42 @@
+# ChatCraft plugin configuration (owner program).
+
+# Display name shown in the app's server list. When empty, the server.properties
+# motd is used.
+# name: My Server
+
+# Set to false to stop appearing in the app's Featured list (you stay verified).
+listing: true
+
+# Languages your server is listed under. Only the primary subtag is used,
+# e.g. pt-BR -> pt. An empty list means the server is not listed.
+languages: []
+
+# Your server address as players see it, host[:port] (default port 25565).
+# Optional; when set, /chatcraft verify uses it without an argument.
+# address: play.example.com:25565
+
+# Up to 3 https vote links shown in the app. Non-https links are ignored.
+vote-links: []
+
+# Staff toolkit (stage 2): players with the chatcraft.staff permission can enrol a phone
+# with /chatcraft staff and then get an encrypted push for every alert.
+
+# Built-in /report command: players can report another player (rate-limited per player).
+reports: true
+report-cooldown-seconds: 30
+
+# Action templates shown to enrolled staff in the app (at most 10). The app fills
+# {player}, {from} and {target} and runs the result as a chat command as the staff
+# player. Commands must not start with "/" and are at most 100 characters.
+# staff-actions:
+#   - id: kick
+#     label: Kick player
+#     command: kick {player}
+#     target: player
+#     confirm: true
+#   - id: warn
+#     label: Warn (from alert)
+#     command: tell {from} Please follow the rules, {target}
+#     target: alert
+#     confirm: true
+staff-actions: []

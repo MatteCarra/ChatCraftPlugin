@@ -1,0 +1,19 @@
+name: ChatCraft
+version: ${version}
+main: app.chatcraft.plugin.ChatCraftPlugin
+description: ChatCraft owner program plugin - free featured visibility in the ChatCraft server list after a one-time verification, plus a staff toolkit (alerts by encrypted push, action templates) for server staff.
+authors: [ChatCraft]
+commands:
+  chatcraft:
+    description: ChatCraft owner program. Run /chatcraft help for the commands you can use.
+    usage: /<command> help
+  report:
+    description: Report a player to the server staff (when reports are enabled in config.yml).
+    usage: /report <player> [reason]
+permissions:
+  chatcraft.admin:
+    description: /chatcraft verify, status, alert and staff removal (server operators by default).
+    default: op
+  chatcraft.staff:
+    description: Enrol a phone for staff alerts (/chatcraft staff) and receive alerts (server operators by default; grant to your staff in your permission plugin).
+    default: op

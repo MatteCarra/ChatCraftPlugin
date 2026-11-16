@@ -1,0 +1,81 @@
+plugins {
+    id 'java'
+    // Shadow jar for distribution: the final artifact is a single
+    // ChatCraft-<version>.jar. No obfuscation and no minimisation - all
+    // dependencies are compileOnly (Spigot ships Gson), so nothing is
+    // relocated or shaded.
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+group = 'app.chatcraft'
+version = '1.0.0'
+
+java {
+    // Java 8 bytecode: the plugin must run on Spigot/Paper 1.8+.
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+// Compile against the Java 8 API as well (--release 8), so no newer JDK
+// classes sneak in even when building on a newer JDK.
+compileJava {
+    options.release.set(8)
+}
+compileTestJava {
+    options.release.set(8)
+}
+
+repositories {
+    mavenCentral()
+    // Spigot API snapshots (1.8.8-R0.1-SNAPSHOT) and their transitives
+    // (bungeecord-chat 1.8-SNAPSHOT, avaje ebean) live on the Spigot nexus.
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+}
+
+dependencies {
+    // Spigot API is compile-only: the server provides it at runtime, and
+    // pinning 1.8.8 guarantees we never use anything newer than 1.8.
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    // Gson is shipped inside the Spigot 1.8.8 server jar (declared by the
+    // spigot-api 1.8.8 POM as com.google.code.gson:gson:2.2.4), so the plugin
+    // uses it without bundling it.
+    compileOnly 'com.google.code.gson:gson:2.2.4'
+
+    testImplementation 'junit:junit:4.13.2'
+    // Same Gson the server provides at runtime, for the unit tests.
+    testImplementation 'com.google.code.gson:gson:2.2.4'
+    // Tests touch classes that implement Bukkit interfaces (e.g.
+    // VerifyChannelListener), so the API must be on the test classpath too.
+    testImplementation 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+}
+
+test {
+    useJUnit()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+}
+
+// plugin.yml takes its version from `version` above, so a release is one edit.
+processResources {
+    filesMatching('plugin.yml') {
+        expand(version: project.version)
+    }
+}
+
+// The plain jar is disabled so `build` produces exactly one artifact in
+// build/libs: the shadow jar below.
+jar {
+    enabled = false
+}
+
+shadowJar {
+    archiveFileName = "ChatCraft-${project.version}.jar"
+    manifest {
+        attributes(
+                'Implementation-Title': 'ChatCraft',
+                'Implementation-Version': project.version
+        )
+    }
+}

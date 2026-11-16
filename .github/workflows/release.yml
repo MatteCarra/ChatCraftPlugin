@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Tag must equal the build version
+        run: |
+          version=$(sed -n "s/^version = '\(.*\)'/\1/p" build.gradle)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match build.gradle version $version" >&2
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Test and build the jar
+        run: ./gradlew test shadowJar
+
+      - name: Jar must be Java 8 bytecode
+        run: |
+          major=$(unzip -p "build/libs/ChatCraft-$VERSION.jar" app/chatcraft/plugin/ChatCraftPlugin.class | head -c 8 | xxd -s 7 -l 1 -p)
+          [ "$major" = "34" ] || { echo "class major version is 0x$major, expected 0x34 (Java 8)" >&2; exit 1; }
+
+      - name: Checksum
+        run: cd build/libs && sha256sum "ChatCraft-$VERSION.jar" > "ChatCraft-$VERSION.jar.sha256"
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "build/libs/ChatCraft-$VERSION.jar" "build/libs/ChatCraft-$VERSION.jar.sha256" \
+            --title "ChatCraft $VERSION" --generate-notes
